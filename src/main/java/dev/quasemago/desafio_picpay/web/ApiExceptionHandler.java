@@ -1,11 +1,11 @@
 package dev.quasemago.desafio_picpay.web;
 
 import dev.quasemago.desafio_picpay.domain.transaction.exception.PicPayTransactionException;
+import dev.quasemago.desafio_picpay.domain.wallet.exception.PicPayInvalidWalletException;
 import dev.quasemago.desafio_picpay.domain.wallet.exception.PicPayWalletNotFoundException;
 import dev.quasemago.desafio_picpay.infra.authorization.exception.PicPayAuthorizationException;
 import dev.quasemago.desafio_picpay.infra.notification.exception.PicPayNotificationException;
 import dev.quasemago.desafio_picpay.web.dto.ErrorMessageDTO;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +17,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ApiExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorMessageDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
-                                                                                 HttpServletRequest request,
-                                                                                 BindingResult result) {
+    public ResponseEntity<ErrorMessageDTO> handleMethodArgumentNotValidException(BindingResult result) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorMessageDTO(HttpStatus.BAD_REQUEST, "Invalid field(s)", result));
     }
 
-    @ExceptionHandler({PicPayAuthorizationException.class, PicPayNotificationException.class, PicPayTransactionException.class})
+    @ExceptionHandler({
+            PicPayAuthorizationException.class,
+            PicPayNotificationException.class,
+            PicPayTransactionException.class,
+            PicPayInvalidWalletException.class
+    })
     public ResponseEntity<ErrorMessageDTO> handlePicPayGeneralException(RuntimeException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
