@@ -1,8 +1,8 @@
 package dev.quasemago.desafio_picpay.domain.transaction.service;
 
-import dev.quasemago.desafio_picpay.domain.transaction.exception.PicPayTransactionException;
 import dev.quasemago.desafio_picpay.domain.transaction.model.Transaction;
 import dev.quasemago.desafio_picpay.domain.transaction.repository.TransactionRepository;
+import dev.quasemago.desafio_picpay.domain.transaction.service.rules.TransactionRule;
 import dev.quasemago.desafio_picpay.domain.wallet.model.Wallet;
 import dev.quasemago.desafio_picpay.domain.wallet.service.WalletService;
 import dev.quasemago.desafio_picpay.infra.authorization.AuthorizationService;
@@ -20,15 +20,18 @@ public class TransactionService {
     private final WalletService walletService;
     private final AuthorizationService authorizationService;
     private final NotificationService notificationService;
+    private final List<TransactionRule> transactionRules;
 
     public TransactionService(TransactionRepository transactionRepository,
                               WalletService walletService,
                               AuthorizationService authorizationService,
-                              NotificationService notificationService) {
+                              NotificationService notificationService,
+                              List<TransactionRule> transactionRules) {
         this.transactionRepository = transactionRepository;
         this.walletService = walletService;
         this.authorizationService = authorizationService;
         this.notificationService = notificationService;
+        this.transactionRules = transactionRules;
     }
 
     @Transactional
@@ -54,15 +57,7 @@ public class TransactionService {
     }
 
     private void validateTransactionRules(Wallet payer, Wallet payee, BigDecimal value) {
-        if (payer.getType() == Wallet.WalletType.SELLER) {
-            throw new PicPayTransactionException("Lojistas não podem fazer transferências!");
-        }
-        if (payer == payee) {
-            throw new PicPayTransactionException("O pagador e beneficiário não podem ser os mesmos!");
-        }
-        if (payer.getBalance().compareTo(value) < 0) {
-            throw new PicPayTransactionException("O pagador não possui saldo suficiente para esta transferência.");
-        }
+        transactionRules.forEach(item -> item.validate(payer, payee, value));
     }
 
     @Transactional(readOnly = true)
