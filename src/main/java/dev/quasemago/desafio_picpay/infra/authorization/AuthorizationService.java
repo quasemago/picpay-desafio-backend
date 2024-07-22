@@ -1,7 +1,7 @@
 package dev.quasemago.desafio_picpay.infra.authorization;
 
-import dev.quasemago.desafio_picpay.infra.authorization.exception.PicPayAuthorizationException;
 import dev.quasemago.desafio_picpay.domain.transaction.model.Transaction;
+import dev.quasemago.desafio_picpay.infra.authorization.exception.PicPayAuthorizationException;
 import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +19,12 @@ public class AuthorizationService {
     public void authorize(Transaction transaction) {
         logger.info("Autorizando transação {}...", transaction);
         try {
-            authorizationClient.requestAuthorization();
+            final var response = authorizationClient.requestAuthorization();
+            if (!response.data().authorization()) {
+                throw new PicPayAuthorizationException("A transação não foi autorizada!");
+            }
         } catch (FeignException ex) {
-            throw new PicPayAuthorizationException("A transação não foi autorizada!");
+            throw new PicPayAuthorizationException("Erro durante a autorização da transação.");
         }
     }
 }
