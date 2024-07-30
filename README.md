@@ -29,7 +29,7 @@ Após tudo instalado, basta abrir o terminal na pasta raiz do projeto, e executa
 ## Executando
 Com o projeto já compilado, observe que será criado uma pasta chamada `target` na raiz do projeto, essa pasta contem o nosso projeto compilado, sendo nomeado de `desafio-picpay-0.0.1-SNAPSHOT`.
 
-Após entrar na pasta, para executar o projeto, basta executar o comando `java -jar e-commerce-1.0-SNAPSHOT.jar` via terminal.
+Após entrar na pasta, para executar o projeto, basta executar o comando `java -jar desafio-picpay-0.0.1-SNAPSHOT` via terminal.
 
 ## API
 ### EndPoints:
