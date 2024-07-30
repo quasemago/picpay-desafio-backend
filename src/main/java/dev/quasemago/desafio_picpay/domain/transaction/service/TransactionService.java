@@ -1,5 +1,6 @@
 package dev.quasemago.desafio_picpay.domain.transaction.service;
 
+import dev.quasemago.desafio_picpay.domain.transaction.exception.PicPayTransactionNotFoundException;
 import dev.quasemago.desafio_picpay.domain.transaction.model.Transaction;
 import dev.quasemago.desafio_picpay.domain.transaction.repository.TransactionRepository;
 import dev.quasemago.desafio_picpay.domain.transaction.service.rules.TransactionRule;
@@ -63,5 +64,11 @@ public class TransactionService {
     @Transactional(readOnly = true)
     public List<Transaction> listTransactions() {
         return transactionRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Transaction getTransactionById(String id) {
+        return transactionRepository.findById(id)
+                .orElseThrow(() -> new PicPayTransactionNotFoundException("Transaction id " + id + " not found"));
     }
 }

@@ -1,6 +1,7 @@
 package dev.quasemago.desafio_picpay.web;
 
 import dev.quasemago.desafio_picpay.domain.transaction.exception.PicPayTransactionException;
+import dev.quasemago.desafio_picpay.domain.transaction.exception.PicPayTransactionNotFoundException;
 import dev.quasemago.desafio_picpay.domain.wallet.exception.PicPayInvalidWalletException;
 import dev.quasemago.desafio_picpay.domain.wallet.exception.PicPayWalletNotFoundException;
 import dev.quasemago.desafio_picpay.infra.authorization.exception.PicPayAuthorizationException;
@@ -37,8 +38,11 @@ public class ApiExceptionHandler {
                 .body(new ErrorMessageDTO(HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 
-    @ExceptionHandler(PicPayWalletNotFoundException.class)
-    public ResponseEntity<ErrorMessageDTO> handlePicPayWalletNotFound(RuntimeException ex) {
+    @ExceptionHandler({
+            PicPayWalletNotFoundException.class,
+            PicPayTransactionNotFoundException.class
+    })
+    public ResponseEntity<ErrorMessageDTO> handlePicPayExceptionNotFound(RuntimeException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
